@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         khp_gemcha
 // @namespace    https://github.com/hanzoman42/khp_minion
-// @version      2018.10.30.001
+// @version      2018.10.30.002
 // @description  auto gemcha
 // @author       You
 // @updateURL    https://github.com/hanzoman42/khp_minion/khp_gemcha.user.js
@@ -567,7 +567,10 @@ function draw_gemcha_session_table() {
 
 function create_status_log() {
     if (window.top === window.self) {
-        gemcha_db.populate_db(GM_getValue("gemcha_db"));
+        var gemcha_db_JSON = GM_getValue("gemcha_db");
+        if (gemcha_db != undefined) {
+            gemcha_db.populate_db(GM_getValue("gemcha_db"));
+        }
 
         var new_element = document.createElement("div");
         new_element.id = "status_container"
