@@ -1,0 +1,288 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<div id="log" style=""></div>
+		<script type="text/javascript" src="../sjx_minion_data_structures.js"></script>
+		<script type="text/javascript" src="../jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript">
+			var activity_count = 0;
+			var style_string = {
+				complete_str : "",
+				append : function(new_style_type,new_style_value) {
+					if (this.complete_str != "") { this.complete_str += " "; }
+					this.complete_str += new_style_type + ":" + new_style_value + ";";
+				},
+				clear : function() {
+					this.complete_str = "";
+				}
+			};
+
+			var sidebar_width = 100;
+			var sidebar_vert_offset = 100;
+			//var sidebar_content_width = sidebar_width - 10;
+			var modal_vert_offset = sidebar_vert_offset + 10;
+			var modal_width = 800;
+			var top_content_frame_height = 180;
+			var content_offset = 5;
+			var m_sidebar_menu_height = 87;
+			var m_sidebar_gemcha_menu_height = 88;
+			var scroll_bar_width = 30;
+
+			function inject_css() {
+				var m_sidebar_css = $("<style type='text/css'></style>").appendTo("head");
+				m_sidebar_css.append(".m_sidebar_btn {width: 100%; display: block; border-style: solid; border-color: white; border-width: 1px; border-radius: 5px; color: white; font-family: Arial; font-size: 12px; text-align: center; padding: 5px;}");
+				m_sidebar_css.append(".m_sidebar_menu_btn {background-color: DarkSlateGrey;}");
+				m_sidebar_css.append(".m_sidebar_menu_btn_selected {color: DarkSlateGrey; font-weight: bold; background-color: Gold;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_text {display: flex; justify-content: center; align-items: center; color: white; font-family: Arial; font-weight: bold;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_box {width: 60px; height: 60px; display: grid; grid-template-columns: 100%; align-items: space-around; grid-row-gap: 5px; border-style: solid; border-color: white; border-width: 1px; border-radius: 5px; padding: 5px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_label {font-size: 12px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_pulls {font-size: 24px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_rates {font-size: 16px;}");
+			}
+
+			function draw_sidebar_menu() {
+				$("#m_sidebar_menu").append($("<button>Gem Gacha</button>").attr("id","m_sidebar_menu_btn_gemcha"));
+				$("#m_sidebar_menu_btn_gemcha").addClass("m_sidebar_btn m_sidebar_menu_btn m_sidebar_menu_btn_selected");
+
+	            $("#m_sidebar_menu").append($("<button>Quests</button>").attr("id","m_sidebar_menu_btn_quests"));
+	            $("#m_sidebar_menu_btn_quests").addClass("m_sidebar_btn m_sidebar_menu_btn");
+
+				$("#m_sidebar_menu").append($("<button>Options</button>").attr("id","m_sidebar_menu_btn_options"));
+	            $("#m_sidebar_menu_btn_options").addClass("m_sidebar_btn m_sidebar_menu_btn");
+	            //$("#m_sidebar_menu_btn_stats").text("Options");
+	            /*$("#m_sidebar_menu_btn_stats").click(function() {
+	                $("#m_sidebar_stats_container").show();
+	                update_statistics;
+	            });*/
+			};
+
+			function draw_gemcha() {
+				// pure container for gemcha content
+	            $("#m_sidebar_content").append($("<div></div>").attr("id","m_sidebar_gemcha_container"));
+	            $("#m_sidebar_gemcha_container").css({
+	                "position": "absolute",
+	                "top": "0px",
+	                "right": "0px",
+	                "bottom": "0px",
+	                "left": "0px",
+	            });
+
+				$("#m_sidebar_gemcha_container").append($("<div></div>").attr("id","m_sidebar_gemcha_content"));
+	            $("#m_sidebar_gemcha_content").css({
+	                "position": "absolute",
+	                "top": "0px",
+	                "right": "0px",
+	                "bottom": m_sidebar_gemcha_menu_height + 5 + "px",
+	                "left": "0px",
+	                "padding": "5px",
+	                "border-radius": "5px",
+	                "display": "grid",
+	                "grid-template-columns": "100%",
+	                "justify-items": "center",
+	                "align-content": "start",
+					"grid-row-gap": "5px",
+	                "background-color": "SlateGrey"
+	            });
+
+	            var stat_id_str = ["weap_sl","helix","eseed","total"];
+				var stat_label_str = ["R Weapons","Half Elixir","Energy Seed","Total Pulls"];
+				var stat_colors = ["SlateBlue","Crimson","LimeGreen","DarkSlateGrey"];
+
+				for (var i_stat_ptr = 0; i_stat_ptr < 4; i_stat_ptr++) {
+		            $("#m_sidebar_gemcha_content").append($("<div>" + stat_label_str[i_stat_ptr] + "</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_label"));
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_label").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_label");
+
+		            $("#m_sidebar_gemcha_content").append($("<div></div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box"));
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").addClass("m_sidebar_gemcha_box");
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").css({"background-color": stat_colors[i_stat_ptr]});
+
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").append($("<div>0</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_pulls"));
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_pulls").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_pulls");
+
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").append($("<div>0.0%</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_rate"));
+		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_rate").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_rates");
+	        	}
+
+	            // menu for gem gacha
+	            $("#m_sidebar_gemcha_container").append($("<div></div>").attr("id","m_sidebar_gemcha_menu"));
+	            $("#m_sidebar_gemcha_menu").css({
+	                "height": m_sidebar_gemcha_menu_height + "px",
+	                "position": "absolute",
+	                "right": "0px",
+	                "bottom": "0px",
+	                "left": "0px",
+	                "padding": "0px",
+	                "display": "grid",
+					"grid-template-columns": "100%",
+					"grid-row-gap": "5px",
+	                //"background-color": "LightSlateGrey"
+	            });
+
+	            $("#m_sidebar_gemcha_menu").append($("<button>Start</button>").attr("id","m_sidebar_gemcha_menu_btn_start"));
+	            $("#m_sidebar_gemcha_menu_btn_start").addClass("m_sidebar_btn")
+	            $("#m_sidebar_gemcha_menu_btn_start").css({"background-color": "Green"});
+
+	            $("#m_sidebar_gemcha_menu").append($("<button>Log</button>").attr("id","m_sidebar_gemcha_menu_btn_log"));
+	            $("#m_sidebar_gemcha_menu_btn_log").addClass("m_sidebar_btn")
+	            $("#m_sidebar_gemcha_menu_btn_log").css({"background-color": "DodgerBlue"});
+
+	            $("#m_sidebar_gemcha_menu").append($("<button>Statistics</button>").attr("id","m_sidebar_gemcha_menu_btn_stats"));
+	            $("#m_sidebar_gemcha_menu_btn_stats").addClass("m_sidebar_btn")
+	            $("#m_sidebar_gemcha_menu_btn_stats").css({"background-color": "DodgerBlue"});
+			};
+
+			function draw_statistics_modal() {
+				$("body").append($("<div></div>").attr("id","m_sidebar_gemcha_stats_modal"));
+				$("#m_sidebar_gemcha_stats_modal").css({
+					"width": modal_width + "px",
+					"position": "fixed",
+					"top": modal_vert_offset + "px",
+					"right": sidebar_width + "px",
+					"bottom": modal_vert_offset + "px",
+					"padding": "0px",
+					"border-radius": "10px 0px 0px 10px",
+					"background-color": "DarkSlateGrey"
+				});
+
+				$("#m_sidebar_gemcha_stats_modal").append($("<div>Statistics</div>").attr("id","m_sidebar_gemcha_stats_content"));
+				$("#m_sidebar_gemcha_stats_content").css({
+					"position": "absolute",
+					"top": content_offset + "px",
+					"right": content_offset + "px",
+					"bottom": content_offset + "px",
+					"left": content_offset + "px",
+					"padding": "0px",
+					"border-radius": "5px",
+					"background-color": "LightSlateGrey"
+				});
+				init_chart();
+			};
+
+			function init_chart() {
+				google.charts.load("current",{"packages":["corechart"]});
+				google.charts.setOnLoadCallback(draw_chart);
+			}
+
+			function draw_chart() {
+				var data = new google.visualization.DataTable();
+				data.addColumn("string","Time");
+				data.addColumn("number","R Weap Count");
+				data.addRows([
+					["10:45am",5],
+					["12:30pm",10],
+					["3:17pm",15],
+					["4:17pm",5],
+					["5:20pm",7],
+					["6:56pm",9],
+					["9:20pm",5],
+					["11:15pm",13]
+				]);
+				
+				var options = {"title": "Gacha Pulls", "width" : (modal_width - 10) + "px", "height": "580px"};
+
+				var chart = new google.visualization.ColumnChart(document.getElementById("m_sidebar_gemcha_stats_content"));
+				chart.draw(data,options);
+			}
+
+			function draw_sidebar() {
+				inject_css();
+
+	            $("body").append($("<div></div>").attr("id","m_sidebar_container"));
+	            $("#m_sidebar_container").css({
+	                "width": sidebar_width + "px",
+	                "position": "fixed",
+	                "top": sidebar_vert_offset + "px",
+	                "right": "0px",
+	                "bottom": sidebar_vert_offset + "px",
+	                "padding": "0px",
+	                "border-radius": "10px 0px 0px 10px",
+	                "background-color": "DarkSlateGrey"
+	            });
+
+	            $("#m_sidebar_container").append($("<div></div>").attr("id","m_sidebar_content"));
+	            $("#m_sidebar_content").css({
+	                "position": "absolute",
+	                "top": content_offset + "px",
+	                "right": content_offset + "px",
+	                "left": content_offset + "px",
+	                "bottom": m_sidebar_menu_height + 10 + "px",
+	                "padding": "0px",
+	                "border-radius": "5px",
+	                //"background-color": "LightSlateGrey"
+	            });
+
+	            $("#m_sidebar_container").append($("<div></div>").attr("id","m_sidebar_menu"));
+	            $("#m_sidebar_menu").css({
+	                "height": m_sidebar_menu_height + "px",
+	                "position": "absolute",
+	                "right": content_offset + "px",
+	                "left": content_offset + "px",
+	                "bottom": content_offset + "px",
+	                "padding": "0px",
+	                "display": "grid",
+					"grid-template-columns": "100%",
+					"grid-row-gap": "5px"
+	                //"background-color": "LightSlateGrey"
+	            });
+
+	            draw_sidebar_menu();
+	            draw_gemcha();
+	            draw_statistics_modal();
+		        		
+			};
+
+			/*function log_status_msg(inner_html_content) {
+				activity_count++;
+				var new_element = document.createElement("p");
+				style_string.clear();
+				style_string.append("border-style","solid");
+				style_string.append("border-color","LightSlateGrey");
+				style_string.append("border-width","1px");
+				style_string.append("border-radius","3px");
+				style_string.append("padding","5px");
+				style_string.append("margin","1px");
+				style_string.append("color","Black");
+				style_string.append("font-family","Arial");
+				style_string.append("font-size","10px");
+				style_string.append("background-color","White");
+    			new_element.style = style_string.complete_str;
+				new_element.html(inner_html_content;
+				document.getElementById("status_log_msg_frame").appendChild(new_element);
+			}*/
+
+			function update_session_status(new_session) {
+				$("#m_sidebar_gemcha_weap_sl_pulls").html(new_session.pull_stats.weap_sl);
+				$("#m_sidebar_gemcha_weap_sl_rate").html((new_session.pull_stats.weap_sl_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_helix_pulls").html(new_session.pull_stats.helix);
+				$("#m_sidebar_gemcha_helix_rate").html((new_session.pull_stats.helix_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_eseed_pulls").html(new_session.pull_stats.eseed);
+				$("#m_sidebar_gemcha_eseed_rate").html((new_session.pull_stats.eseed_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_total_pulls").html(new_session.pull_stats.count());
+				$("#m_sidebar_gemcha_total_rate").html("100.0%");
+			}
+
+			var current_pull = new Pull_Statistics;
+			var current_session = new Pull_Session;
+			var current_db = new Pull_Database;
+			
+			$(document).ready(function() {
+				draw_sidebar();
+				var simulated_pulls;
+				var simulated_time = new Date(2018,10,30,0,0,0,0);
+				current_session.time_start = simulated_time;
+				for (simulated_pulls = 0; simulated_pulls < 110; simulated_pulls++) {
+					current_pull.generate_pull();
+					simulated_time = new Date(2018,10,30,Math.floor(Math.random() * 24),Math.floor(Math.random() * 60),0,0);
+					current_pull.time_pull = simulated_time;
+				//	log_status_msg(current_pull.get_status());
+				//	current_db.push(current_pull);
+					current_session.update_statistics(current_pull);
+					update_session_status(current_session);
+				}
+			});
+			//console.log(current_db.query_minutes(5));
+		</script>
+	</body>
+</html>
