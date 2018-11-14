@@ -1,0 +1,18 @@
+	{
+		"name": "SJX Minion",
+		"version": "2018.11.7.001",
+		"description": "Personal minion",
+		"permissions": ["declarativeContent","storage"],
+		"background": {
+			"scripts": ["background.js"],
+			"persistent": false
+		},
+		"content_scripts": [{
+			"matches": ["https://www.nutaku.net/games/kamihime-r/play/"],
+			"js": ["jquery-3.3.1.min.js"]
+		}],
+		"page_action": {
+			"default_popup": "sjx_minion_popup.html"
+		},
+		"manifest_version": 2
+	}
