@@ -12,7 +12,7 @@
 			"js": ["jquery-3.3.1.min.js"]
 		}],
 		"page_action": {
-			"default_popup": "sjx_minion_popup.html"
+			"default_popup": "khp_minion_popup.html"
 		},
 		"manifest_version": 2
 	}

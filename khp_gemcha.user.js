@@ -769,7 +769,10 @@ function start(){
 }
 
 function getGachaInfo(){
-    kh.createInstance("apiAGacha").getCategory("normal").then(function(e) {var normalGachaInfo = e.body;drawGacha(normalGachaInfo);}.bind(this));
+    kh.createInstance("apiAGacha").getCategory("normal").then(function(e) {
+        var normalGachaInfo = e.body;
+        drawGacha(normalGachaInfo);
+    }.bind(this));
 }
 
 function process_result(event){
@@ -866,7 +869,7 @@ function drawGacha(normalGachaInfo){
     }
 }
 
-function saleWeapons(){
+function saleWeapons() {
      kh.createInstance("apiAWeapons").getList(0,500).then(function(e) {var list = e.body;
                                                                        var sellList = [];
                                                                        var ids = [];
@@ -884,35 +887,40 @@ function saleWeapons(){
                                                                        }}.bind(this));
 }
 
-function saleEidolons(){
-     kh.createInstance("apiASummons").getList(0,500).then(function(e) {var list = e.body;
-                                                                       var sellList = [];
-                                                                       var ids = [];
-                                                                       list.data.forEach(function(item){
-                                                                           {if (item.can_sell && item.bonus === 0 && (item.rare === "N" || (sell_R_Eidolons && item.rare === "R" || (sell_SR_Eidolons && item.rare === "SR")))) {
-                                                                               ids.push(item.a_summon_id);
-                                                                               sellList.push(item);
-                                                                           }}
-                                                                       });
-                                                                       if (ids.length ===0) {console.log("No eidolons to sell, go to gacha");
-                                                                                             kh.createInstance("router").navigate("gacha/ga_004");}
-                                                                       else {
-                                                                           console.log(sellList);
-                                                                           kh.createInstance("apiASummons").sell(ids).then(function(e) {kh.createInstance("router").navigate("gacha/ga_004");}.bind(this));
-                                                                       }}.bind(this));
+function saleEidolons() {
+    kh.createInstance("apiASummons").getList(0,500).then(function(e) {
+        var list = e.body;
+        var sellList = [];
+        var ids = [];
+        list.data.forEach(function(item){{
+            if (item.can_sell && item.bonus === 0 && (item.rare === "N" || (sell_R_Eidolons && item.rare === "R" || (sell_SR_Eidolons && item.rare === "SR")))) {
+                ids.push(item.a_summon_id);
+                sellList.push(item);
+            }
+        }});
+        if (ids.length ===0) {
+            console.log("No eidolons to sell, go to gacha");
+            kh.createInstance("router").navigate("gacha/ga_004");}
+        else {
+            //console.log(sellList);
+            kh.createInstance("apiASummons").sell(ids).then(function(e) {
+                kh.createInstance("router").navigate("gacha/ga_004");
+            }.bind(this));
+        }
+    }.bind(this));
 }
 
 function has(obj) {
-	var prop;
-    var i;
+	var prop; // variable
+    var i; // variable
 	try {
-        if (obj !== Object(obj)) {
-            return false;
+        if (obj !== Object(obj)) { // what does this mean? obj is not of object type
+            return false; // then obj does not exist
         }
-        for (i = 1; i < arguments.length; i++) {
-            prop = arguments[i];
-            if ((prop in obj) && obj[prop] !== null && obj[prop] !== 'undefined') {
-                obj = obj[prop];
+        for (i = 1; i < arguments.length; i++) { // iterate through each argument passed in
+            prop = arguments[i]; // assign arguement to prop variable
+            if ((prop in obj) && obj[prop] !== null && obj[prop] !== 'undefined') { // if property is in object and property in object is not null nor undefined
+                obj = obj[prop]; // obj = property in object i.e. if more than one argument, it iterates into the object
             } else {
                 return false;
             }

@@ -3,7 +3,7 @@
 	</head>
 	<body>
 		<div id="log" style=""></div>
-		<script type="text/javascript" src="../sjx_minion_data_structures.js"></script>
+		<script type="text/javascript" src="../khp_minion_data_structures.js"></script>
 		<script type="text/javascript" src="../jquery-3.3.1.min.js"></script>
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 		<script type="text/javascript">
@@ -20,12 +20,14 @@
 			};
 
 			var sidebar_width = 100;
+			var sidebar_height = 600;
 			var sidebar_vert_offset = 100;
 			//var sidebar_content_width = sidebar_width - 10;
-			var modal_vert_offset = sidebar_vert_offset + 10;
+			var modal_vert_offset = 10;
 			var modal_width = 800;
 			var top_content_frame_height = 180;
 			var content_offset = 5;
+			var gemcha_box_size = 25;
 			var m_sidebar_menu_height = 87;
 			var m_sidebar_gemcha_menu_height = 88;
 			var scroll_bar_width = 30;
@@ -36,10 +38,11 @@
 				m_sidebar_css.append(".m_sidebar_menu_btn {background-color: DarkSlateGrey;}");
 				m_sidebar_css.append(".m_sidebar_menu_btn_selected {color: DarkSlateGrey; font-weight: bold; background-color: Gold;}");
 				m_sidebar_css.append(".m_sidebar_gemcha_text {display: flex; justify-content: center; align-items: center; color: white; font-family: Arial; font-weight: bold;}");
-				m_sidebar_css.append(".m_sidebar_gemcha_box {width: 60px; height: 60px; display: grid; grid-template-columns: 100%; align-items: space-around; grid-row-gap: 5px; border-style: solid; border-color: white; border-width: 1px; border-radius: 5px; padding: 5px;}");
-				m_sidebar_css.append(".m_sidebar_gemcha_label {font-size: 12px;}");
-				m_sidebar_css.append(".m_sidebar_gemcha_pulls {font-size: 24px;}");
-				m_sidebar_css.append(".m_sidebar_gemcha_rates {font-size: 16px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_box {width: " + gemcha_box_size + "px; height: " + gemcha_box_size + "px; display: grid; grid-template-columns: 100%; align-items: space-around; grid-row-gap: 5px; border-style: solid; border-color: white; border-width: 1px; border-radius: 5px; padding: 5px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_label {grid-column: 1 / span 2; font-size: 12px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_sess_label {font-size: 10px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_pulls {font-size: 12px;}");
+				m_sidebar_css.append(".m_sidebar_gemcha_rates {font-size: 8px;}");
 			}
 
 			function draw_sidebar_menu() {
@@ -79,30 +82,39 @@
 	                "padding": "5px",
 	                "border-radius": "5px",
 	                "display": "grid",
-	                "grid-template-columns": "100%",
+	                "grid-template-columns": "50% 50%",
 	                "justify-items": "center",
 	                "align-content": "start",
 					"grid-row-gap": "5px",
 	                "background-color": "SlateGrey"
 	            });
 
-	            var stat_id_str = ["weap_sl","helix","eseed","total"];
+	            var stat_id_str = ["weap_r","helix","eseed","total"];
 				var stat_label_str = ["R Weapons","Half Elixir","Energy Seed","Total Pulls"];
 				var stat_colors = ["SlateBlue","Crimson","LimeGreen","DarkSlateGrey"];
+				var stat_sess_id_str = ["pull","sess"];
+				var stat_sess_label_str = ["Pull","Sess"];
 
 				for (var i_stat_ptr = 0; i_stat_ptr < 4; i_stat_ptr++) {
 		            $("#m_sidebar_gemcha_content").append($("<div>" + stat_label_str[i_stat_ptr] + "</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_label"));
 		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_label").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_label");
 
-		            $("#m_sidebar_gemcha_content").append($("<div></div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box"));
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").addClass("m_sidebar_gemcha_box");
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").css({"background-color": stat_colors[i_stat_ptr]});
+		            for (var i_sess_ptr = 0; i_sess_ptr <2; i_sess_ptr++) {
+		            	$("#m_sidebar_gemcha_content").append($("<div>" + stat_sess_label_str[i_sess_ptr] + "</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_label"));
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_label").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_sess_label");
+			        }
 
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").append($("<div>0</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_pulls"));
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_pulls").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_pulls");
+			        for (i_sess_ptr = 0; i_sess_ptr <2; i_sess_ptr++) {
+			            $("#m_sidebar_gemcha_content").append($("<div></div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_box"));
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_box").addClass("m_sidebar_gemcha_box");
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_box").css({"background-color": stat_colors[i_stat_ptr]});
 
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_box").append($("<div>0.0%</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_rate"));
-		            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_rate").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_rates");
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_box").append($("<div>1100</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_pulls"));
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_pulls").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_pulls");
+
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_box").append($("<div>100.0%</div>").attr("id","m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_rate"));
+			            $("#m_sidebar_gemcha_" + stat_id_str[i_stat_ptr] + "_" + stat_sess_id_str[i_sess_ptr] + "_rate").addClass("m_sidebar_gemcha_text m_sidebar_gemcha_rates");
+			        }
 	        	}
 
 	            // menu for gem gacha
@@ -137,16 +149,17 @@
 				$("body").append($("<div></div>").attr("id","m_sidebar_gemcha_stats_modal"));
 				$("#m_sidebar_gemcha_stats_modal").css({
 					"width": modal_width + "px",
+					"height": sidebar_height - (modal_vert_offset * 2) + "px",
 					"position": "fixed",
-					"top": modal_vert_offset + "px",
+					"top": sidebar_vert_offset + modal_vert_offset + "px",
 					"right": sidebar_width + "px",
-					"bottom": modal_vert_offset + "px",
+					//"bottom": modal_vert_offset + "px",
 					"padding": "0px",
 					"border-radius": "10px 0px 0px 10px",
 					"background-color": "DarkSlateGrey"
 				});
 
-				$("#m_sidebar_gemcha_stats_modal").append($("<div>Statistics</div>").attr("id","m_sidebar_gemcha_stats_content"));
+				$("#m_sidebar_gemcha_stats_modal").append($("<div></div>").attr("id","m_sidebar_gemcha_stats_content"));
 				$("#m_sidebar_gemcha_stats_content").css({
 					"position": "absolute",
 					"top": content_offset + "px",
@@ -155,8 +168,18 @@
 					"left": content_offset + "px",
 					"padding": "0px",
 					"border-radius": "5px",
-					"background-color": "LightSlateGrey"
+					"background-color": "White"
 				});
+
+				$("#m_sidebar_gemcha_stats_content").append($("<div></div>").attr("id","m_sidebar_gemcha_stats_chart"));
+				$("#m_sidebar_gemcha_stats_chart").css({
+					"position": "absolute",
+					"top": content_offset + "px",
+					"right": content_offset + "px",
+					"bottom": content_offset + "px",
+					"left": content_offset + "px",
+					"padding": "0px",
+				});				
 				init_chart();
 			};
 
@@ -180,9 +203,9 @@
 					["11:15pm",13]
 				]);
 				
-				var options = {"title": "Gacha Pulls", "width" : (modal_width - 10) + "px", "height": "580px"};
+				var options = {"title": "Gacha Pulls", "width" : (modal_width - 20) + "px", "height": sidebar_height - (modal_vert_offset * 4) + "px"};
 
-				var chart = new google.visualization.ColumnChart(document.getElementById("m_sidebar_gemcha_stats_content"));
+				var chart = new google.visualization.ColumnChart(document.getElementById("m_sidebar_gemcha_stats_chart"));
 				chart.draw(data,options);
 			}
 
@@ -192,10 +215,11 @@
 	            $("body").append($("<div></div>").attr("id","m_sidebar_container"));
 	            $("#m_sidebar_container").css({
 	                "width": sidebar_width + "px",
+	                "height": sidebar_height + "px",
 	                "position": "fixed",
 	                "top": sidebar_vert_offset + "px",
 	                "right": "0px",
-	                "bottom": sidebar_vert_offset + "px",
+	                //"bottom": sidebar_vert_offset + "px",
 	                "padding": "0px",
 	                "border-radius": "10px 0px 0px 10px",
 	                "background-color": "DarkSlateGrey"
@@ -229,7 +253,7 @@
 
 	            draw_sidebar_menu();
 	            draw_gemcha();
-	            draw_statistics_modal();
+	            //draw_statistics_modal();
 		        		
 			};
 
@@ -253,14 +277,31 @@
 			}*/
 
 			function update_session_status(new_session) {
-				$("#m_sidebar_gemcha_weap_sl_pulls").html(new_session.pull_stats.weap_sl);
-				$("#m_sidebar_gemcha_weap_sl_rate").html((new_session.pull_stats.weap_sl_rate() * 100).toFixed(1) + "%");
-				$("#m_sidebar_gemcha_helix_pulls").html(new_session.pull_stats.helix);
-				$("#m_sidebar_gemcha_helix_rate").html((new_session.pull_stats.helix_rate() * 100).toFixed(1) + "%");
-				$("#m_sidebar_gemcha_eseed_pulls").html(new_session.pull_stats.eseed);
-				$("#m_sidebar_gemcha_eseed_rate").html((new_session.pull_stats.eseed_rate() * 100).toFixed(1) + "%");
-				$("#m_sidebar_gemcha_total_pulls").html(new_session.pull_stats.count());
-				$("#m_sidebar_gemcha_total_rate").html("100.0%");
+				$("#m_sidebar_gemcha_weap_r_sess_pulls").html(new_session.pull_stats.weap_r);
+				$("#m_sidebar_gemcha_weap_r_sess_rate").html((new_session.pull_stats.weap_r_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_helix_sess_pulls").html(new_session.pull_stats.helix);
+				$("#m_sidebar_gemcha_helix_sess_rate").html((new_session.pull_stats.helix_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_eseed_sess_pulls").html(new_session.pull_stats.eseed);
+				$("#m_sidebar_gemcha_eseed_sess_rate").html((new_session.pull_stats.eseed_rate() * 100).toFixed(1) + "%");
+				$("#m_sidebar_gemcha_total_sess_pulls").html(new_session.pull_stats.count());
+				$("#m_sidebar_gemcha_total_sess_rate").html("100.0%");
+			}
+
+			function simulate_pulls() {
+				var simulated_pulls;
+				var simulated_time = new Date(2018,10,30,0,0,0,0);
+				
+				current_session.time_start = simulated_time;
+				for (simulated_pulls = 0; simulated_pulls < 110; simulated_pulls++) {
+					console.log("pulling...");
+					current_pull.generate_pull();
+					simulated_time = new Date(2018,10,30,Math.floor(Math.random() * 24),Math.floor(Math.random() * 60),0,0);
+					current_pull.time_pull = simulated_time;
+				//	log_status_msg(current_pull.get_status());
+					current_db.push(current_pull);
+					current_session.update_statistics(current_pull);
+					update_session_status(current_session);
+				}
 			}
 
 			var current_pull = new Pull_Statistics;
@@ -269,18 +310,7 @@
 			
 			$(document).ready(function() {
 				draw_sidebar();
-				var simulated_pulls;
-				var simulated_time = new Date(2018,10,30,0,0,0,0);
-				current_session.time_start = simulated_time;
-				for (simulated_pulls = 0; simulated_pulls < 110; simulated_pulls++) {
-					current_pull.generate_pull();
-					simulated_time = new Date(2018,10,30,Math.floor(Math.random() * 24),Math.floor(Math.random() * 60),0,0);
-					current_pull.time_pull = simulated_time;
-				//	log_status_msg(current_pull.get_status());
-				//	current_db.push(current_pull);
-					current_session.update_statistics(current_pull);
-					update_session_status(current_session);
-				}
+				setTimeout(simulate_pulls,5000);
 			});
 			//console.log(current_db.query_minutes(5));
 		</script>

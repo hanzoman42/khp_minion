@@ -1,21 +1,25 @@
-function Pull_Statistics(new_time_pull = Date.now(),new_weap_n = 0,new_weap_sl = 0,new_weap_enh = 0,new_eido = 0,new_helix = 0,new_eseed = 0,new_item = 0) {
+function Pull_Statistics(new_time_pull = Date.now(),new_weap_n = 0,new_weap_r = 0,new_weap_enh_r = 0,new_weap_enh_sr = 0,new_eido_n = 0,new_eido_r = 0,new_eido_enh_r = 0,new_eido_enh_sr = 0,new_helix = 0,new_eseed = 0,new_item = 0) {
 	this.time_pull = new_time_pull;
 	this.weap_n = new_weap_n;
-	this.weap_sl = new_weap_sl;
-	this.weap_enh = new_weap_enh;
-	this.eido = new_eido;
+	this.weap_r = new_weap_r;
+	this.weap_enh_r = new_weap_enh_r;
+	this.weap_enh_sr = new_weap_enh_sr;
+	this.eido_n = new_eido_n;
+	this.eido_r = new_eido_r;
+	this.eido_enh_r = new_eido_enh_r;
+	this.eido_enh_sr = new_eido_enh_sr;
 	this.helix = new_helix;
 	this.eseed = new_eseed;
 	this.item = new_item;
 	this.count = function() {
-		return this.weap_n + this.weap_sl + this.weap_enh + this.eido + this.helix + this.eseed + this.item;
+		return this.weap_n + this.weap_r + this.weap_enh_r + this.weap_enh_sr + this.eido_n + this.eido_r + this.eido_enh_r + this.eido_enh_sr + this.helix + this.eseed + this.item;
 	};
-	this.weap_sl_rate = function() {
+	this.weap_r_rate = function() {
 		if (this.count() == 0) {
 			return 0;
 		}
 		else {
-			return this.weap_sl / this.count();
+			return this.weap_r / this.count();
 		}
 	};
 	this.helix_rate = function() {
@@ -49,7 +53,7 @@ function Pull_Statistics(new_time_pull = Date.now(),new_weap_n = 0,new_weap_sl =
 		output_str += " | ";
 		output_str += "Pulls: " + this.count();
 		output_str += " | ";
-		output_str += "R weapons: " + this.weap_sl + " (" + (this.weap_sl_rate() * 100).toFixed(2) + "%)";
+		output_str += "R weapons: " + this.weap_r + " (" + (this.weap_r_rate() * 100).toFixed(2) + "%)";
 		output_str += " | ";
 		output_str += "Half elixir: " + this.helix + " (" + (this.helix_rate() * 100).toFixed(2) + "%)";
 		output_str += " | ";
@@ -60,9 +64,13 @@ function Pull_Statistics(new_time_pull = Date.now(),new_weap_n = 0,new_weap_sl =
 		var pull_stats = {
 			time_pull : this.time_pull,
 			weap_n : this.weap_n,
-			weap_sl : this.weap_sl,
-			weap_enh : this.weap_enh,
-			eido : this.eido,
+			weap_r : this.weap_r,
+			weap_enh_r : this.weap_enh_r,
+			weap_enh_sr : this.weap_enh_sr,
+			eido_n : this.eido_n,
+			eido_r : this.eido_r,
+			eido_enh_r : this.eido_enh_r,
+			eido_enh_sr : this.eido_enh_sr,
 			helix : this.helix,
 			eseed : this.eseed,
 			item : this.item
@@ -75,16 +83,20 @@ function Pull_Statistics(new_time_pull = Date.now(),new_weap_n = 0,new_weap_sl =
 	this.reset_values = function() {
 		this.time_pull = Date.now();
 		this.weap_n = 0;
-		this.weap_sl = 0;
-		this.weap_enh = 0;
-		this.eido = 0;
+		this.weap_r = 0;
+		this.weap_enh_r = 0;
+		this.weap_enh_sr = 0;
+		this.eido_n = 0;
+		this.eido_r = 0;
+		this.eido_enh_r = 0;
+		this.eido_enh_sr = 0;
 		this.helix = 0;
 		this.eseed = 0;
 		this.item = 0;
 	}
 	// for testing purposes only
 	this.generate_pull = function () {
-		var pull_type_array = ['weap_n','weap_sl','weap_enh','eido','helix','eseed','item'];
+		var pull_type_array = ['weap_n','weap_r','weap_enh_r','weap_enh_sr','eido_n','eido_r','eido_enh_r','eido_enh_sr','helix','eseed','item'];
 		var pull_count;
 		this.reset_values();
 		for (pull_count = 0; pull_count < 10; pull_count++) {
@@ -97,32 +109,21 @@ function Pull_Session() {
 	this.time_start = Date.now();
 	this.pull_stats = new Pull_Statistics();
 	this.update_statistics = function(new_pull_stats) {
-		this.pull_stats.time_pull = new_pull_stats.time_pull;	
+		this.pull_stats.time_pull = new_pull_stats.time_pull;
 		this.pull_stats.weap_n += new_pull_stats.weap_n;
-		this.pull_stats.weap_sl += new_pull_stats.weap_sl;
-		this.pull_stats.weap_enh += new_pull_stats.weap_enh;
-		this.pull_stats.eido += new_pull_stats.eido;
+		this.pull_stats.weap_r += new_pull_stats.weap_r;
+		this.pull_stats.weap_enh_r += new_pull_stats.weap_enh_r;
+		this.pull_stats.weap_enh_sr += new_pull_stats.weap_enh_sr;
+		this.pull_stats.eido_n += new_pull_stats.eido_n;
+		this.pull_stats.eido_r += new_pull_stats.eido_r;
+		this.pull_stats.eido_enh_r += new_pull_stats.eido_enh_r;
+		this.pull_stats.eido_enh_sr += new_pull_stats.eido_enh_sr;
 		this.pull_stats.helix += new_pull_stats.helix;
 		this.pull_stats.eseed += new_pull_stats.eseed;
 		this.pull_stats.item += new_pull_stats.item;
 	};
 	this.get_session_time = function() {
 		return (this.pull_stats.time_pull - this.time_start)/1000;
-	};
-	this.get_status = function() {
-		var output_str = "";
-		output_str += "Start time: " + new Date(this.time_start).toLocaleTimeString();
-		output_str += " | ";
-		output_str += "Run time: " + Math.floor(this.get_session_time().toFixed(0) / 60) + " mins " + (this.get_session_time().toFixed(0) - (Math.floor(this.get_session_time().toFixed(0) / 60) * 60)) + " secs ";
-		output_str += " | ";
-		output_str += "Pulls: " + this.pull_stats.count();
-		output_str += " | ";
-		output_str += "R weapons: " + this.pull_stats.weap_sl + " (" + (this.pull_stats.weap_sl_rate() * 100).toFixed(2) + "%)";
-		output_str += " | ";
-		output_str += "Half elixir: " + this.pull_stats.helix + " (" + (this.pull_stats.helix_rate() * 100).toFixed(2) + "%)";
-		output_str += " | ";
-		output_str += "Seed: " + this.pull_stats.eseed + " (" + (this.pull_stats.eseed_rate() * 100).toFixed(2) + "%)";
-		return output_str;
 	};
 	this.set_session_start_time = function() {
 		this.time_start = Date.now();
@@ -138,7 +139,7 @@ function Pull_Database() {
 		var import_array = JSON.parse(JSON_str);
 		var key;
 		for (key in import_array) {
-			this.push(new Pull_Statistics(import_array[key].time_pull,import_array[key].weap_n,import_array[key].weap_sl,import_array[key].weap_enh,import_array[key].eido,import_array[key].helix,import_array[key].eseed,import_array[key].item));
+			this.push(new Pull_Statistics(import_array[key].time_pull,import_array[key].weap_n,import_array[key].weap_r,import_array[key].weap_enh_r,import_array[key].weap_enh_sr,import_array[key].eido_n,import_array[key].eido_r,import_array[key].eido_enh_r,import_array[key].eido_enh_sr,import_array[key].helix,import_array[key].eseed,import_array[key].item));
 		}
 	};
 	this.export_db = function() {
@@ -160,12 +161,16 @@ function Pull_Database() {
 		var new_time_index = new_pull_stats.get_pull_time_index();
 		if (!this.entry_exists(new_time_index)) {
 			this.pull_stats_array[new_time_index] = new Pull_Statistics;
-			var new_time = new Date();
+			var new_time = new Date(new_pull_stats.time_pull);
 			this.pull_stats_array[new_time_index].time_pull = new Date(new_time.getFullYear(),new_time.getMonth(),new_time.getDate(),new Date(new_pull_stats.time_pull).getHours(),new Date(new_pull_stats.time_pull).getMinutes(),0,0);
 			this.pull_stats_array[new_time_index].weap_n = new_pull_stats.weap_n;
-			this.pull_stats_array[new_time_index].weap_sl = new_pull_stats.weap_sl;
-			this.pull_stats_array[new_time_index].weap_enh = new_pull_stats.weap_enh;
-			this.pull_stats_array[new_time_index].eido = new_pull_stats.eido;
+			this.pull_stats_array[new_time_index].weap_r = new_pull_stats.weap_r;
+			this.pull_stats_array[new_time_index].weap_enh_r = new_pull_stats.weap_enh_r;
+			this.pull_stats_array[new_time_index].weap_enh_sr = new_pull_stats.weap_enh_sr;
+			this.pull_stats_array[new_time_index].eido_n = new_pull_stats.eido_n;
+			this.pull_stats_array[new_time_index].eido_r = new_pull_stats.eido_r;
+			this.pull_stats_array[new_time_index].eido_enh_r = new_pull_stats.eido_enh_r;
+			this.pull_stats_array[new_time_index].eido_enh_sr = new_pull_stats.eido_enh_sr;
 			this.pull_stats_array[new_time_index].helix = new_pull_stats.helix;
 			this.pull_stats_array[new_time_index].eseed = new_pull_stats.eseed;
 			this.pull_stats_array[new_time_index].item = new_pull_stats.item;
@@ -173,9 +178,13 @@ function Pull_Database() {
 		else {
 			this.pull_stats_array[new_time_index].time_pull = new_pull_stats.time_pull;
 			this.pull_stats_array[new_time_index].weap_n += new_pull_stats.weap_n;
-			this.pull_stats_array[new_time_index].weap_sl += new_pull_stats.weap_sl;
-			this.pull_stats_array[new_time_index].weap_enh += new_pull_stats.weap_enh;
-			this.pull_stats_array[new_time_index].eido += new_pull_stats.eido;
+			this.pull_stats_array[new_time_index].weap_r += new_pull_stats.weap_r;
+			this.pull_stats_array[new_time_index].weap_enh_r += new_pull_stats.weap_enh_r;
+			this.pull_stats_array[new_time_index].weap_enh_sr += new_pull_stats.weap_enh_sr;
+			this.pull_stats_array[new_time_index].eido_n += new_pull_stats.eido_n;
+			this.pull_stats_array[new_time_index].eido_r += new_pull_stats.eido_r;
+			this.pull_stats_array[new_time_index].eido_enh_r += new_pull_stats.eido_enh_r;
+			this.pull_stats_array[new_time_index].eido_enh_sr += new_pull_stats.eido_enh_sr;
 			this.pull_stats_array[new_time_index].helix += new_pull_stats.helix;
 			this.pull_stats_array[new_time_index].eseed += new_pull_stats.eseed;
 			this.pull_stats_array[new_time_index].item += new_pull_stats.item;	
