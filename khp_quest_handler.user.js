@@ -115,15 +115,43 @@ var elements = ["fire","water","wind","thunder","dark","light"];
 //Variables used throughout the script
 var info = {}, href, state, quest;
 
+
+function getServerResetHour() {
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+
+	// DST Start
+	var firstOfMarch = new Date(currentYear, 2, 1);
+	var daysUntilFirstSundayInMarch = (7 - firstOfMarch.getDay()) % 7;
+	var secondSundayInMarch = firstOfMarch.getDate() + daysUntilFirstSundayInMarch + 7;
+	var dstStartDate = new Date(currentYear, 2, secondSundayInMarch);
+
+	// DST End
+	var firstOfNovember = new Date(currentYear, 10, 1);
+	var daysUntilFirstSundayInNov = (7 - firstOfNovember.getDay()) % 7;
+	var firstSundayInNovember = firstOfNovember.getDate() + daysUntilFirstSundayInNov;
+	var dstEndDate = new Date(currentYear, 10, firstSundayInNovember);
+
+	if (currentDate >= dstStartDate && currentDate < dstEndDate) {
+		return 15;
+	}
+	else {
+		return 16;
+	}
+}
+
+
+
 //Start method, loaded whenever the script gets loaded or restarted.
 function waitBeforeStart() {
     info.questPriorityList = questPriorityList.slice(); // creates a copy of the quest priority list into the info variable
     info.raidPriorityList = raidPriorityList.slice(); // creates a copy of the raid priority list into the info variable
     quest = undefined;
     // sets href variable for use by refreshPage() function
-    if (location.host === "cf.r.kamihimeproject.dmmgames.com"){
+    if (location.host === "cf.r.kamihimeproject.dmmgames.com") {
         href = "https://cf.r.kamihimeproject.dmmgames.com/front/cocos2d-proj/components-pc/mypage_quest_party_guild_enh_evo_gacha_present_shop_epi_acce_detail/app.html"; // note: cf.r
-    } else {
+    } 
+    else {
         href = "https://cf.g.kamihimeproject.dmmgames.com/front/cocos2d-proj/components-pc/mypage_quest_party_guild_enh_evo_gacha_present_shop_epi_acce_detail/app.html"; // note: cf.g
     }
     if (location.pathname === "/front/cocos2d-proj/components-pc/scenario/app.html" || // skip scenario
@@ -133,16 +161,18 @@ function waitBeforeStart() {
         refreshPage();
         return;
     }
-    //If in results screen, get the results first.
+    // If in results screen after a battle, get the results first.
     if (has(kh,"createInstance")) {
         if (location.hash.startsWith("#!quest/q_003_1")){
             console.log("Getting results.");
-            setTimeout(refreshPage,3000*timeoutMulti); // calls refreshPage after 3 seconds x time multiplier
-        } else {
-            getPlayerInfo();
+            setTimeout(refreshPage, 3000 * timeoutMulti); // calls refreshPage after 3 seconds x time multiplier
         }
-    } else {
-        setTimeout(waitBeforeStart,1000*timeoutMulti); // calls waitBeforeStart after 1 second x time multiplier
+        else {
+            getPlayerInfo(); // gets player information
+        }
+    }
+    else {
+        setTimeout(waitBeforeStart, 1000 * timeoutMulti); // calls waitBeforeStart after 1 second x time multiplier
     }
 }
 
@@ -161,6 +191,7 @@ function getPlayerInfo(){
                 kh.createInstance("apiAParties").getDecks().then(function (h) {
                     //The parties the player has available
                     info.parties = h.body;
+                    console.log(info);
                     checkQuestInfo();
                 }.bind(this));
             }.bind(this));
@@ -196,7 +227,8 @@ function checkQuestInfo(){
     else {
         if (quest === undefined){
             checkPriorityList();
-        }else{
+        }
+        else{
             //Shouldn't ever get here anymore i think?
             console.log("Contact me if this message pops up.");
             getQuestList();
@@ -211,7 +243,6 @@ function checkPriorityList(){
         console.log(info.questPriorityList);
         console.log(info.raidPriorityList);
     }
-
     //Check do_first
     for (var i=0; i<info.questPriorityList.length; i++){
         if (has(info.questPriorityList[i], "do_first") && info.questPriorityList[i].do_first){
@@ -220,7 +251,6 @@ function checkPriorityList(){
             return;
         }
     }
-
     //Check raids first
     if (info.raidPriorityList.length !== 0){
         quest = info.raidPriorityList.shift();

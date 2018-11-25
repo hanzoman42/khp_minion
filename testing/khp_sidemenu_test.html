@@ -145,6 +145,33 @@
 	            $("#m_sidebar_gemcha_menu_btn_stats").css({"background-color": "DodgerBlue"});
 			};
 
+			function draw_quests_options_modal() {
+				$("body").append($("<div></div>").attr("id","m_sidebar_quests_options_modal"));
+				$("#m_sidebar_quests_options_modal").css({
+					"width": modal_width + "px",
+					"height": sidebar_height - (modal_vert_offset * 2) + "px",
+					"position": "fixed",
+					"top": sidebar_vert_offset + modal_vert_offset + "px",
+					"right": sidebar_width + "px",
+					//"bottom": modal_vert_offset + "px",
+					"padding": "0px",
+					"border-radius": "10px 0px 0px 10px",
+					"background-color": "DarkSlateGrey"
+				});
+
+				$("#m_sidebar_quests_options_modal").append($("<div></div>").attr("id","m_sidebar_quests_options_content"));
+				$("#m_sidebar_quests_options_content").css({
+					"position": "absolute",
+					"top": content_offset + "px",
+					"right": content_offset + "px",
+					"bottom": content_offset + "px",
+					"left": content_offset + "px",
+					"padding": "0px",
+					"border-radius": "5px",
+					"background-color": "White"
+				});
+			}
+
 			function draw_statistics_modal() {
 				$("body").append($("<div></div>").attr("id","m_sidebar_gemcha_stats_modal"));
 				$("#m_sidebar_gemcha_stats_modal").css({
