@@ -1,0 +1,41 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<div id="log" style=""></div>
+		<script type="text/javascript" src="../khp_minion_data_structures.js"></script>
+		<script type="text/javascript" src="../jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript">
+
+			function getNextServerResetTime() {
+			    var currentDate = new Date();
+				var currentYear = currentDate.getFullYear();
+
+				// DST Start
+				var firstOfMarch = new Date(currentYear, 2, 1);
+				var daysUntilFirstSundayInMarch = (7 - firstOfMarch.getDay()) % 7;
+				var secondSundayInMarch = firstOfMarch.getDate() + daysUntilFirstSundayInMarch + 7;
+				var dstStartDate = new Date(currentYear, 2, secondSundayInMarch);
+
+				// DST End
+				var firstOfNovember = new Date(currentYear, 10, 1);
+				var daysUntilFirstSundayInNov = (7 - firstOfNovember.getDay()) % 7;
+				var firstSundayInNovember = firstOfNovember.getDate() + daysUntilFirstSundayInNov;
+				var dstEndDate = new Date(currentYear, 10, firstSundayInNovember);
+
+				if (currentDate >= dstStartDate && currentDate < dstEndDate) {
+					var serverResetHour = 15;
+				}
+				else {
+					serverResetHour = 16;
+				}
+
+			    return new Date(currentDate.getFullYear(),currentDate.getMonth(),currentDate.getDate()+1,serverResetHour,0,0,0);
+			}
+
+			console.log(getNextServerResetTime().toLocaleString());
+
+		</script>
+	</body>
+</html>

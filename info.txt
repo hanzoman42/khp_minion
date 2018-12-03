@@ -1,0 +1,66 @@
+info
+
+banners:
+
+parties: {decks: Array(12)}
+
+player:
+	a_player_id: 2161967
+	a_union_id: 44605
+	accessory_num: 299
+	can_use_accessory: true
+	character_num: 216
+	description: "F100|Wa60|Wi100|T105|L110|D60"
+	description_text_id: "26182064"
+	dmm_id: "17424961"
+	exp: 325959
+	friend_max_num: 50
+	friend_num: 50
+	is_me: true
+	job_info:
+		exp: 0
+		job_id: 30
+		level: 20
+		max_acquirable_jobs: 30
+		name: "Shingen"
+		next_exp: 0
+		total_acquired_jobs: 30
+login_date: "3 minutes ago "
+max_accessory_num: 300
+max_summon_num: 190
+max_weapon_num: 400
+name: "pandamic77"
+next_exp: 247751
+rank: 124
+selected_party:
+questInfo:
+	accessory_quest_max_challenge_count: 3
+	accessory_quest_remaining_challenge_count: 3
+	current_a_area_id: 2327477
+	current_a_world_id: 2161143
+	current_area_id: 1
+	has_completed_last_main_quest: false
+	has_follow_up_quest: false
+	has_new_harem: true
+	has_new_raid_request: true
+	has_temp_quest: false
+	has_unlocked_area: false
+	has_unlocked_quest: false
+	has_unverified: false
+	in_progress: {help_raid_ids: Array(0), is_unverified: false}
+	max_battle_count: 3
+	next_a_area_id: null
+	next_a_quest_id: null
+
+questPoints:
+	ap: 4
+	ap_recover_time: "Rem: 05:15"
+	bp: 0
+	bp_recover_time: "Rem: 01:40"
+	max_ap: 109
+	max_bp: 5
+
+questPriorityList: (3) [{…}, {…}, {…}]
+raidIDs: [{…}]
+raidPriorityList: []
+requests: [{…}]

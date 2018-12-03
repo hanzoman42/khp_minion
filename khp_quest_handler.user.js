@@ -18,41 +18,220 @@
 // @run-at       document-end
 // ==/UserScript==
 
-//Quest presets
-var aq4 = {"type": "accessory", "ap": 35, "element": "light", "use_he": false};
-var dailySP = {"type":"daily", "element": "dark", "party": "H", "use_he": false, "ap": 50};
-var dailyGemQuest = {"type": "gem_daily", "use_he": true, "element": "dark", "ap": 25};
-var gemQuest = {"type": "gem", "use_he": true, "element": "dark", "do_first": true};
-//var gemQuest = {"type": "gem", "use_he": true, "element": "dark"};
-var eventQuest = {"type": "event", "party": "A", "ap": 30, "use_he": false};
-var standardEventRaid = {"type": "event_raid", "ap": 15, "element": "dark", "summon": "Anubis", "use_he": false};
-var expertEventRaid = {"type": "event_raid", "ap": 25, "element": "dark", "summon": "Anubis", "use_he": false, "priority": "participants","max_participants": 2, "min_time": 10, "min_hp": 70, "min_bp": 1};
-var ragnarokEventRaid = {"type": "event_raid", "ap": 35, "element": "dark", "summon": "Anubis", "use_he": false, "priority": "participants", "max_participants": 4, "min_time": 40, "min_bp": 4};
-var lilimRaid = {"type": "lilim", "use_he": false, "ap": 25, "element": "dark", "summon": "Anubis", "min_bp": 2};
+/*available parameters
 
-var fireRag = {"type": "disaster", "raid_element": "fire", "element": "water", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
-var waterRag = {"type": "disaster", "raid_element": "water", "element": "thunder", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
-var windRag = {"type": "disaster", "raid_element": "wind", "element": "fire", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
-var thunderRag = {"type": "disaster", "raid_element": "thunder", "element": "wind", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
-var lightRag = {"type": "disaster", "raid_element": "light", "element": "dark", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
-var darkRag = {"type": "disaster", "raid_element": "dark", "element": "light", "use_he": false, "min_bp": 5, "min_hp": 80, "priority": "participants", "ap": 50};
+General:
+"type": The type of the quest, this is the only parameter that's always mandatory. See quest types below for available ones.
+"element": The element that you want to use for this quest. If not set, it'll either pick the recommended one or the currently active party, depending on selectRecommended.
+"party": Selects a specific party for this quest ("A" to "L"). Overwrites "element".
+"ap": This allows you to select which difficulty you want to pick. If there is no "ap" property, it'll automatically select the highest difficulty (quests)
+        or search for all difficulties (raids). For raids, it's the ap that it would take to host it (even for joining).
+"summon": First tries to find said summon. If not specified, it picks the first available helper
+"summon_element": If you want to set a helper from a different element (f.e. Sleipnir while using a water team), then you need to specify which element the Eidolon is.
 
-var storyEvent = {"type": "story_event", "ap": 30, "element": "fire", "use_he": false};
+QUEST ONLY:
+"use_he": If set to false, this quest won't be using any half elixirs.
+"do_first": Check if this quest is available before you check for raids
+"wait_for_ap": If set to true and the quest is available, it will ignore all quests after this.
+
+RAID ONLY:
+"raid_element": To select an element for disaster raids. See elements below for available elements. Has to be set for quests, if not set for raids, it will search for all elements.
+"union_only": If a raid has this property set to true, you'll only join raids that contain at least 1 union member.
+"min_bp": If a raid has this property, it will only search for it if your current BP exceed the min_bp value. If not set, it'll always join if it finds a suitable one.
+"max_participants": If a raid has this property, it will ignore all raids with more than the set amount of participants.
+"min_participants": If a raid has this property, it will ignore all raids with less than the set amount of participants.
+"min_time": If a raid has this property, it will ignore all raids with less than set time remaining (in minutes).
+"min_hp": If a raid has this property, it will ignore all raids with less than set HP remaining(percentual, f.e.: 50 for half HP).
+"priority": When you want to join a raid and there are multiple equal options, this will decide the sorting method used to determine the one you join.
+"hp": Joins the raid with the highest HP. This is the default.
+"union": If there are raids fitting the criteria with union members, it'll join those first. If multiple union raids -> takes the highest HP one.
+"time": Selects the raid that still has the most amount of time left.
+"participants": Selects the raid that has the least amount of people in it.
+
+UE Demon only:
+"id": Which of the 3 open raids you want to join (1-3).
+"not_last": Set to true to join one of the first 2 raids (which one gets decided by other filters).
+
+*/
+
+//SP QUESTS
+var aq4 = {
+    "type": "accessory",
+    "element": "light",
+    "use_he": false,
+    "ap": 35
+};
+var dailySP = {
+    "type":"daily",
+    "element": "dark",
+    "party": "H",
+    "use_he": false,
+    "ap": 50
+};
+var gemQuest = {
+    "type": "gem",
+    "use_he": true,
+    "element": "dark",
+    "do_first": true
+};
+
+// ADVENT EVENT QUESTS
+var eventQuest = {
+    "type": "event",
+    "party": "A",
+    "use_he": false,
+    "ap": 30
+};
+
+// RAID EVENTS QUESTS
+var raidEventElement = "dark";
+var raidEventSummon = "Anubis";
+var standardEventRaid = {
+    "type": "event_raid",
+    "element": raidEventElement,
+    "summon": raidEventSummon,
+    "use_he": false,
+    "ap": 15
+};
+var expertEventRaid = {
+    "type": "event_raid",
+    "ap": 25,
+    "element": raidEventElement,
+    "summon": raidEventSummon,
+    "use_he": false,
+    "priority": "participants",
+    "max_participants": 2,
+    "min_time": 10,
+    "min_hp": 70,
+    "min_bp": 1
+};
+var ragnarokEventRaid = {
+    "type": "event_raid",
+    "ap": 35,
+    "element": raidEventElement,
+    "summon": raidEventSummon,
+    "use_he": false,
+    "priority": "participants",
+    "max_participants": 4,
+    "min_time": 40,
+    "min_bp": 4
+};
+
+// RAID QUESTS
+var fireRag = {
+    "type": "disaster",
+    "raid_element": "fire",
+    "element": "water",   
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+var waterRag = {
+    "type": "disaster",
+    "raid_element": "water",
+    "element": "thunder",
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+var windRag = {
+    "type": "disaster",
+    "raid_element": "wind",
+    "element": "fire",
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+var thunderRag = {
+    "type": "disaster",
+    "raid_element": "thunder",
+    "element": "wind",
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+var lightRag = {
+    "type": "disaster",
+    "raid_element": "light",
+    "element": "dark",
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+var darkRag = {
+    "type": "disaster",
+    "raid_element": "dark",
+    "element": "light",
+    "min_hp": 80,
+    "priority": "participants",
+    "use_he": false,
+    "ap": 50,
+    "min_bp": 5
+};
+
+// UNION EVENT
+var ueElement = "dark";
+var lilimRaid = {
+    "type": "lilim",
+    "use_he": false,
+    "element": ueElement,
+    "ap": 25,
+    "min_bp": 2
+};
+var unionExpert = {
+    "type": "ue_expert",
+    "element": ueElement,
+    "max_participants": 4,
+    "not_last": false,
+    "min_hp": 70,
+    "min_bp": 1
+};
+var unionUltimate = {
+    "type": "ue_ultimate",
+    "element": ueElement,
+    "max_participants": 10,
+    "not_last": true,
+    "min_hp": 70,
+    "min_bp": 0
+};
+
+// FOR CROSSOVER EVENTS LIKE KOIHIME
+var storyEvent = {
+    "type": "story_event",
+    "ap": 30,
+    "element": "fire",
+    "use_he": false
+};
 
 //Add all quests you want to check in here: storyEvent lightRag eventQuest darkRag darkRag, eventQuest,
 //var questPriorityList = [gemQuest, dailyGemQuest, lightRag, darkRag, dailySP];
 var questPriorityList = [gemQuest, storyEvent, lightRag, darkRag, dailySP];
 
-//Raid presets
-var disasterRag = {"type": "disaster", "ap": 50, "priority": "participants", "min_hp": 50, "min_bp": 5};
-var unionExpert = {"type": "ue_expert", "element": "dark", "max_participants": 4, "not_last": false, "min_hp": 70, "min_bp": 1};
-var unionUltimate = {"type": "ue_ultimate", "element": "dark", "max_participants": 10, "not_last": true, "min_hp": 70, "min_bp": 0};
+
 //Add all raids you want to check in here (raids get checked before quests): , disasterRag, darkRag
 var raidPriorityList = [darkRag, lightRag, thunderRag, fireRag, waterRag, windRag];
 //var raidPriorityList = [unionUltimate];
 
 //Your settings
-var parties = {"fire": "A","water": "B","wind": "C","thunder": "D","dark": "F","light": "E"};
+var parties = {
+    "fire": "A",
+    "water": "B",
+    "wind": "C",
+    "thunder": "D",
+    "dark": "F",
+    "light": "E"
+};
+
 // For the other parties e.g.: "party": "G"
 var keepRunning = true;         //If no more quests are available and keepRunning is set to true, the script will go through the priorityLists again after 30 seconds.
 var refreshTimeout = 60;        //Seconds that it waits before starting a new cycle on keepRunning
@@ -74,40 +253,7 @@ var summons = [
 ];
 
 
-/*available parameters
 
-General:
-"type": The type of the quest, this is the only parameter that's always mandatory. See quest types below for available ones.
-"element": The element that you want to use for this quest. If not set, it'll either pick the recommended one or the currently active party, depending on selectRecommended.
-"party": Selects a specific party for this quest ("A" to "L"). Overwrites "element".
-"ap": This allows you to select which difficulty you want to pick. If there is no "ap" property, it'll automatically select the highest difficulty (quests)
-        or search for all difficulties (raids). For raids, it's the ap that it would take to host it (even for joining).
-"summon": First tries to find said summon. If not specified, it picks the first available helper
-"summon_element": If you want to set a helper from a different element (f.e. Sleipnir while using a water team), then you need to specify which element the Eidolon is.
-
-Quest only:
-"use_he": If set to false, this quest won't be using any half elixirs.
-"do_first": Check if this quest is available before you check for raids
-"wait_for_ap": If set to true and the quest is available, it will ignore all quests after this.
-
-Raid only:
-"raid_element": To select an element for disaster raids. See elements below for available elements. Has to be set for quests, if not set for raids, it will search for all elements.
-"union_only": If a raid has this property set to true, you'll only join raids that contain at least 1 union member.
-"min_bp": If a raid has this property, it will only search for it if your current BP exceed the min_bp value. If not set, it'll always join if it finds a suitable one.
-"max_participants": If a raid has this property, it will ignore all raids with more than the set amount of participants.
-"min_participants": If a raid has this property, it will ignore all raids with less than the set amount of participants.
-"min_time": If a raid has this property, it will ignore all raids with less than set time remaining (in minutes).
-"min_hp": If a raid has this property, it will ignore all raids with less than set HP remaining(percentual, f.e.: 50 for half HP).
-"priority": When you want to join a raid and there are multiple equal options, this will decide the sorting method used to determine the one you join.
-"hp": Joins the raid with the highest HP. This is the default.
-"union": If there are raids fitting the criteria with union members, it'll join those first. If multiple union raids -> takes the highest HP one.
-"time": Selects the raid that still has the most amount of time left.
-"participants": Selects the raid that has the least amount of people in it.
-
-UE Demon only:
-"id": Which of the 3 open raids you want to join (1-3).
-"not_last": Set to true to join one of the first 2 raids (which one gets decided by other filters).
-*/
 
 var questTypes = ["daily", "gem", "gem_daily", "accessory", "lilim", "disaster", "event_advent", "event_raid", "story_event"];
 var elements = ["fire","water","wind","thunder","dark","light"];
@@ -115,32 +261,50 @@ var elements = ["fire","water","wind","thunder","dark","light"];
 //Variables used throughout the script
 var info = {}, href, state, quest;
 
+function getNextServerResetTime() {
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
 
-function getServerResetHour() {
-	var currentDate = new Date();
-	var currentYear = currentDate.getFullYear();
+    // DST Start
+    var firstOfMarch = new Date(currentYear, 2, 1);
+    var daysUntilFirstSundayInMarch = (7 - firstOfMarch.getDay()) % 7;
+    var secondSundayInMarch = firstOfMarch.getDate() + daysUntilFirstSundayInMarch + 7;
+    var dstStartDate = new Date(currentYear, 2, secondSundayInMarch);
 
-	// DST Start
-	var firstOfMarch = new Date(currentYear, 2, 1);
-	var daysUntilFirstSundayInMarch = (7 - firstOfMarch.getDay()) % 7;
-	var secondSundayInMarch = firstOfMarch.getDate() + daysUntilFirstSundayInMarch + 7;
-	var dstStartDate = new Date(currentYear, 2, secondSundayInMarch);
+    // DST End
+    var firstOfNovember = new Date(currentYear, 10, 1);
+    var daysUntilFirstSundayInNov = (7 - firstOfNovember.getDay()) % 7;
+    var firstSundayInNovember = firstOfNovember.getDate() + daysUntilFirstSundayInNov;
+    var dstEndDate = new Date(currentYear, 10, firstSundayInNovember);
 
-	// DST End
-	var firstOfNovember = new Date(currentYear, 10, 1);
-	var daysUntilFirstSundayInNov = (7 - firstOfNovember.getDay()) % 7;
-	var firstSundayInNovember = firstOfNovember.getDate() + daysUntilFirstSundayInNov;
-	var dstEndDate = new Date(currentYear, 10, firstSundayInNovember);
+    if (currentDate >= dstStartDate && currentDate < dstEndDate) {
+        var serverResetHour = 15;
+    }
+    else {
+        serverResetHour = 16;
+    }
 
-	if (currentDate >= dstStartDate && currentDate < dstEndDate) {
-		return 15;
-	}
-	else {
-		return 16;
-	}
+    return new Date(currentDate.getFullYear(),currentDate.getMonth(),currentDate.getDate()+1,serverResetHour,0,0,0);
 }
 
+/*
+Scheduler data structure
+scheduler = {
+    "nextServerResetTime" : date,
+    "lastServerResetDate" : date,
+}
 
+Pseudocode for scheduler
+
+if (currentTime >= nextServerResetTime) {
+    scheduler.nextServerResetTime = getNextServerResetTime();
+    scheduler.lastServerResetDate = new Date();
+    GM_setValue("nextServerResetTime",nextServerResetTime);
+}
+else {
+    
+}
+*/
 
 //Start method, loaded whenever the script gets loaded or restarted.
 function waitBeforeStart() {
